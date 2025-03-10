@@ -1,0 +1,29 @@
+{
+    "name": "rr-contentful-migrations",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "exports": {
+        "import": "./dist/index.mjs",
+        "require": "./dist/index.cjs"
+    },
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc && cp dist/index.js dist/index.cjs",
+        "test": "npm test"
+    },
+    "author": "Tiago Martins",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "typescript": "^5.7.3"
+    },
+    "dependencies": {
+        "@contentful/rich-text-types": "^17.0.0",
+        "cheerio": "^1.0.0",
+        "contentful-management": "^11.47.2",
+        "json-patch": "^0.7.0",
+        "stream": "^0.0.3",
+        "type-fest": "^4.35.0"
+    }
+}

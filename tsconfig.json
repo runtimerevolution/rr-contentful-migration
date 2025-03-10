@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "ES2020",
+        "moduleResolution": "Node",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "resolveJsonModule": true,
+        "declaration": true,
+        "outDir": "./dist",
+        "baseUrl": ".",
+        "paths": {
+            "contentful-management": [
+                "node_modules/contentful-management/dist/"
+            ]
+        }
+    },
+    "include": ["src/**/*", "types/**/*"]
+}
