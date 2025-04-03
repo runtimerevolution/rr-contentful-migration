@@ -8,3 +8,4 @@ export interface IBaseEntry {
 }
 export declare const formatEntry: (content: Record<string, any>) => IBaseEntry;
 export {};
+//# sourceMappingURL=formatters.d.ts.map

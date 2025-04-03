@@ -2,14 +2,15 @@
     "name": "rr-contentful-migrations",
     "version": "1.0.0",
     "main": "dist/index.js",
-    "exports": {
-        "import": "./dist/index.mjs",
-        "require": "./dist/index.cjs"
-    },
-    "module": "dist/index.js",
     "types": "dist/index.d.ts",
+    "typings": "dist/index.d.ts",
+    "type": "commonjs",
+    "files": [
+        "dist"
+    ],
     "scripts": {
-        "build": "tsc && cp dist/index.js dist/index.cjs",
+        "build": "rm -rf dist && tsc -p tsconfig.json",
+        "prepack": "npm run build",
         "test": "npm test"
     },
     "author": "Tiago Martins",

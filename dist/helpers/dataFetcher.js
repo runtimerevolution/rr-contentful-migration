@@ -63,3 +63,4 @@ const dataFetcher = async (url, retries = 5, timeout = 10000) => {
     }
 };
 exports.dataFetcher = dataFetcher;
+//# sourceMappingURL=dataFetcher.js.map

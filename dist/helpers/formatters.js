@@ -208,3 +208,4 @@ const formatEntry = (content) => ({
     ])),
 });
 exports.formatEntry = formatEntry;
+//# sourceMappingURL=formatters.js.map

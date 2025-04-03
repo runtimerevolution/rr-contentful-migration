@@ -8,7 +8,13 @@
         "strict": true,
         "resolveJsonModule": true,
         "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "removeComments": false,
+        "stripInternal": true,
+        "preserveConstEnums": true,
         "outDir": "./dist",
+        "rootDir": "./src",
         "baseUrl": ".",
         "paths": {
             "contentful-management": [
@@ -16,5 +22,5 @@
             ]
         }
     },
-    "include": ["src/**/*", "types/**/*"]
+    "include": ["src/**/*"]
 }

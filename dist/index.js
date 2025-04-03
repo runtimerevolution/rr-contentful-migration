@@ -9,7 +9,7 @@ Object.defineProperty(exports, "formatEntry", { enumerable: true, get: function 
  * @param spaceId - The Space ID.
  * @param environmentId - The Environment ID.
  * @param accessToken - The access token for authentication.
- * @returns Methods to create or update entries and assets.
+ * @returns Methods for CRUD operations on entries and assets.
  */
 const initContentfulClient = async (spaceId, environmentId, accessToken) => {
     const client = (0, contentful_management_1.createClient)({ accessToken });
@@ -17,13 +17,11 @@ const initContentfulClient = async (spaceId, environmentId, accessToken) => {
     const environment = await space.getEnvironment(environmentId);
     /**
      * Creates or updates a Contentful entry.
-     * - If `entryId` is provided, the existing entry is updated.
-     * - If `entryId` is not provided, a new entry is created.
      * @param contentType - The content type for the entry.
      * @param fields - The fields of the entry.
      * @param uniqueField - The field used to identify uniqueness.
      * @param uniqueValue - The unique value for the unique field.
-     * @param publish - Flag to indicate whether the entry should be published (default is true).
+     * @param publish - Whether to publish the entry (default is true).
      * @returns The created or updated entry.
      */
     const createOrUpdateEntry = async (contentType, fields, uniqueField, uniqueValue, publish = true) => {
@@ -43,13 +41,27 @@ const initContentfulClient = async (spaceId, environmentId, accessToken) => {
         let entry;
         if (entries.items.length > 0) {
             entry = entries.items[0];
-            try {
-                entry = await entry.update();
-                if (publish)
-                    entry = await entry.publish();
-            }
-            catch (error) {
-                console.error(`Error updating entry: ${error.message}`);
+            const existingFields = entry.fields;
+            let hasChanges = false;
+            Object.keys(filteredFields).forEach((key) => {
+                const newValue = filteredFields[key];
+                const existingValue = existingFields[key]?.["en-US"];
+                if (JSON.stringify(newValue["en-US"]) !==
+                    JSON.stringify(existingValue)) {
+                    hasChanges = true;
+                    existingFields[key] = newValue;
+                }
+            });
+            if (hasChanges) {
+                try {
+                    entry.fields = existingFields;
+                    entry = await entry.update();
+                    if (publish)
+                        entry = await entry.publish();
+                }
+                catch (error) {
+                    console.error(`Error updating entry: ${error.message}`);
+                }
             }
         }
         else {
@@ -68,45 +80,62 @@ const initContentfulClient = async (spaceId, environmentId, accessToken) => {
         return entry;
     };
     /**
-     * Creates or updates a Contentful asset from a URL.
-     * - If `assetId` is provided, the existing asset is updated.
-     * - If `assetId` is not provided, a new asset is created.
-     * @param url - The URL of the asset.
-     * @param contentType - The MIME type of the asset.
-     * @param assetId - Optional ID for updating an existing asset.
-     * @param publish - Flag to indicate whether the asset should be published (default is true).
-     * @returns The created or updated asset.
+     * Retrieves a Contentful entry by ID.
+     * @param entryId - The ID of the entry.
+     * @returns The retrieved entry.
      */
-    const createOrUpdateAsset = async (url, contentType, assetId, publish = true) => {
-        const fileName = url.split("/").pop() || "default_filename";
-        const assetFields = {
-            title: { "en-US": fileName },
-            description: { "en-US": "Description of the asset" },
-            file: {
-                "en-US": {
-                    file: { url },
-                    contentType,
-                    fileName,
-                },
-            },
-        };
-        let asset;
-        if (assetId) {
-            asset = await environment.getAsset(assetId);
-            asset.fields = assetFields;
-            asset = await asset.update();
-        }
-        else {
-            asset = await environment.createAsset({ fields: assetFields });
-        }
-        if (publish) {
-            await asset.publish();
-        }
-        return asset;
+    const getEntry = async (entryId) => {
+        return await environment.getEntry(entryId);
+    };
+    /**
+     * Deletes a Contentful entry by ID.
+     * @param entryId - The ID of the entry to delete.
+     */
+    const deleteEntry = async (entryId) => {
+        const entry = await environment.getEntry(entryId);
+        await entry.unpublish().catch(() => { });
+        await entry.delete();
+    };
+    /**
+     * Retrieves a Contentful asset by ID.
+     * @param assetId - The ID of the asset.
+     * @returns The retrieved asset.
+     */
+    const getAsset = async (assetId) => {
+        return await environment.getAsset(assetId);
+    };
+    /**
+     * Deletes a Contentful asset by ID.
+     * @param assetId - The ID of the asset to delete.
+     */
+    const deleteAsset = async (assetId) => {
+        const asset = await environment.getAsset(assetId);
+        await asset.unpublish().catch(() => { });
+        await asset.delete();
+    };
+    const getEntryBySlug = async (contentType, slug) => {
+        const entries = await environment.getEntries({
+            content_type: contentType,
+            "fields.slug.en-US": slug,
+            limit: 1,
+        });
+        return entries.items.length > 0 ? entries.items[0] : null;
+    };
+    const getAllEntries = async (contentType) => {
+        const entries = await environment.getEntries({
+            content_type: contentType,
+        });
+        return entries.items;
     };
     return {
         createOrUpdateEntry,
-        createOrUpdateAsset,
+        getEntry,
+        deleteEntry,
+        getEntryBySlug,
+        getAsset,
+        deleteAsset,
+        getAllEntries,
     };
 };
 exports.initContentfulClient = initContentfulClient;
+//# sourceMappingURL=index.js.map
